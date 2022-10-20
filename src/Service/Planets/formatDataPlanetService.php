@@ -28,9 +28,9 @@ class formatDataPlanetService
         ];
         
         $utilService = new utilService();
-        $result = $utilService->sendResponse(true, $data, 200);        
+        $response = $utilService->sendResponse(true, $data, 200);        
         
-        return $result;
+        return $response;
     }
 
 }

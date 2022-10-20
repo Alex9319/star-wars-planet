@@ -19,17 +19,17 @@ class utilService
      */
     function sendResponse(bool $status, array $data, int $statusCode, string $error = null){
 
-        $result = [
+        $response = [
             'data'       => $data,
             'status'     => $status,
             'statusCode' => $statusCode
         ];
 
         if(!is_null($error)){
-            $result['error'] = $error;
+            $response['error'] = $error;
         }
 
-        return $result;
+        return $response;
     }
 
 }
