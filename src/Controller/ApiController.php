@@ -12,8 +12,8 @@ class ApiController extends AbstractController
     #[Route('/api/planets/{idPlanet}', name: 'api_get_planets',  methods: "GET")]
     public function index(string $idPlanet): JsonResponse
     {
-        $planetDataService = new planetService();
-        $response = $planetDataService->getPlanet($idPlanet);
+        $planetService = new planetService();
+        $response = $planetService->getPlanet($idPlanet);
 
         if(isset($response['error'])){
             return $this->json($response, $response['statusCode']);

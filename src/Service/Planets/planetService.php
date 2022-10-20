@@ -3,6 +3,7 @@
 namespace App\Service\Planets;
 
 use App\Service\Utils\utilService;
+use App\Service\Utils\Validate\validateService;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Positive;
 use Symfony\Component\Validator\Constraints\Type;
@@ -18,38 +19,25 @@ class planetService
      * @return array
      */
     function getPlanet($idPlanet){
-        $utilService = new utilService();
+        $validateService = new validateService();
 
-        // Validate idPlanet
-        $validator = Validation::createValidator();
-        $violations = $validator->validate($idPlanet, [
-            new Type('digit', 'The value of idPlanet is not correct'),
-            new NotBlank(),
-            new Positive(null, 'The value of idPlanet is not correct'),
-        ]);
+        $validatePlanet = $validateService->validateGetPlanet($idPlanet);
 
-        if (0 !== count($violations)) {
-            // there are errors, now you can show them
-            foreach ($violations as $violation) {
-                $result['error'] = $violation->getMessage();
-                $result = $utilService->sendResponse(false, [], 404, $violation->getMessage());        
-                return $result;
-            }
+        if($validatePlanet['status'] == false){
+            return $validatePlanet;
         }
 
         $details = new getDataPlanetService();          
-        $dataPlanet = $details->getData($idPlanet);
+        $dataPlanet = $details->getDataPlanet($idPlanet);
 
         if(!$dataPlanet['status'] || !isset($dataPlanet['data']) || empty($dataPlanet['data']) ){
             return $dataPlanet;
         }
         
         $formatDataService = new formatDataPlanetService();
-        $data = $formatDataService->formatData($dataPlanet['data'], $idPlanet);
-        
-        $result = $utilService->sendResponse($dataPlanet['status'], $data['data'], $dataPlanet['statusCode']);        
+        $response = $formatDataService->formatData($dataPlanet['data'], $idPlanet);       
 
-        return $result;
+        return $response;
     }
 
 }
