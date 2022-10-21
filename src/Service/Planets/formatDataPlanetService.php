@@ -15,15 +15,21 @@ class formatDataPlanetService
      */
     public function formatData($dataInput, $idPlanet){
 
+        if(is_array($dataInput['films'])){
+            $films = count($dataInput['films']);
+        }else{
+            $films = $dataInput['films'];
+        }
+
         $data = [
             'id'              => $idPlanet,
             'name'            => $dataInput['name'],
             'rotation_period' => $dataInput['rotation_period'],
             'orbital_period'  => $dataInput['orbital_period'],
             'diameter'        => $dataInput['diameter'],
-            'films_count'     => count($dataInput['films']),
-            'created'         => $dataInput['created'],
-            'edited'          => $dataInput['edited'],
+            'films_count'     => $films,
+            'created'         => date("c", strtotime($dataInput['created'])),
+            'edited'          => date("c", strtotime($dataInput['edited'])),
             'url'             => $dataInput['url']
         ];
         

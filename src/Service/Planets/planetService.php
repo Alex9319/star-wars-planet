@@ -2,12 +2,8 @@
 
 namespace App\Service\Planets;
 
-use App\Service\Utils\utilService;
-use App\Service\Utils\Validate\validateService;
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints\Positive;
-use Symfony\Component\Validator\Constraints\Type;
-use Symfony\Component\Validator\Validation;
+use App\Service\Utils\validateService;
+use Doctrine\Persistence\ManagerRegistry;
 
 class planetService
 {
@@ -18,7 +14,7 @@ class planetService
      * @param int $idPlanet
      * @return array
      */
-    function getPlanet($idPlanet){
+    function getPlanet(int $idPlanet, ManagerRegistry $doctrine){
         $validateService = new validateService();
 
         $validatePlanet = $validateService->validateGetPlanet($idPlanet);
@@ -28,7 +24,7 @@ class planetService
         }
 
         $details = new getDataPlanetService();          
-        $dataPlanet = $details->getDataPlanet($idPlanet);
+        $dataPlanet = $details->getDataPlanet($idPlanet, $doctrine);
 
         if(!$dataPlanet['status'] || !isset($dataPlanet['data']) || empty($dataPlanet['data']) ){
             return $dataPlanet;
@@ -36,6 +32,33 @@ class planetService
         
         $formatDataService = new formatDataPlanetService();
         $response = $formatDataService->formatData($dataPlanet['data'], $idPlanet);       
+
+        return $response;
+    }
+
+    /**
+     * Function to set a new planet
+     *
+     * @param string $inputParams
+     * @return array
+     */
+    function setPlanet($inputParams, $doctrine){
+        $validatorService = new validateService();
+        $validate = $validatorService->validateSetPlanet($inputParams, $doctrine);
+        
+        if($validate['status'] == false){
+            return $validate;
+        }
+
+        $em = $doctrine->getManager();
+        $dataService = new setDataPlanetService($em);
+        $newPlanet = $dataService->setPlanetData($inputParams);
+
+        if($newPlanet['status'] == false){
+            return $newPlanet;
+        }
+
+        $response = $this->getPlanet($newPlanet['data']['id'], $doctrine);
 
         return $response;
     }

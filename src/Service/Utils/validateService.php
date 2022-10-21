@@ -1,9 +1,10 @@
 <?php
 
-namespace App\Service\Utils\Validate;
+namespace App\Service\Utils;
 
 use App\Service\Planets\getDataPlanetService;
 use App\Service\Utils\utilService;
+use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Positive;
@@ -19,10 +20,26 @@ class validateService
     * @param string $params
     * @return array
     */
-    function validateSetPlanet($params){
+    function validateSetPlanet($params, ManagerRegistry $doctrine){
 
         $utilService = new utilService();
         $decoded = json_decode($params);
+
+        // Validate id
+        $validator = Validation::createValidator();
+        $violations = $validator->validate($decoded->id, [
+            new Type('int', 'The value of id is not correct'),
+            new NotBlank(),
+            new Positive(null, 'The value of id is not correct'),
+        ]);
+        
+        if (0 !== count($violations)) {
+            // there are errors, now you can show them
+            foreach ($violations as $violation) {
+                $response = $utilService->sendResponse(false, [], 404, $violation->getMessage());
+                return $response;
+            }
+        }
 
         // Validate name
         $validator = Validation::createValidator();
@@ -43,24 +60,9 @@ class validateService
                 return $response;
             }
         }
-        // Validate id
-        $validator = Validation::createValidator();
-        $violations = $validator->validate($decoded->id, [
-            new Type('digit', 'The value of id is not correct'),
-            new NotBlank(),
-            new Positive(null, 'The value of id is not correct'),
-        ]);
-        
-        if (0 !== count($violations)) {
-            // there are errors, now you can show them
-            foreach ($violations as $violation) {
-                $response = $utilService->sendResponse(false, [], 404, $violation->getMessage());
-                return $response;
-            }
-        }
         
         $getDataPlanetService = new getDataPlanetService();
-        $existPlanet = $getDataPlanetService->getDataPlanet($decoded->id);
+        $existPlanet = $getDataPlanetService->getDataPlanet($decoded->id, $doctrine);
         
         if($existPlanet['status'] == true){
             $response = $utilService->sendResponse(false, [], 404, 'The planet with id is '.$decoded->id.' now exist');
@@ -84,7 +86,7 @@ class validateService
         // Validate idPlanet
         $validator = Validation::createValidator();
         $violations = $validator->validate($idPlanet, [
-            new Type('digit', 'The value of idPlanet is not correct'),
+            new Type('int', 'The value of idPlanet is not correct'),
             new NotBlank(),
             new Positive(null, 'The value of idPlanet is not correct'),
         ]);
