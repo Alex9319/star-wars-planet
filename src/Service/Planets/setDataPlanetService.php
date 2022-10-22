@@ -32,9 +32,21 @@ class setDataPlanetService
         $planet = new Planets();
         $planet->setId($decodedPanet->id);
         $planet->setName($decodedPanet->name);
-        $planet->setRotationPeriod($decodedPanet->rotation_period);
-        $planet->setOrbitalPeriod($decodedPanet->orbital_period);
-        $planet->setDiameter($decodedPanet->diameter);
+        if(isset($decodedPanet->rotation_period)){
+            $planet->setRotationPeriod($decodedPanet->rotation_period);
+        }else{
+            $planet->setRotationPeriod(0);
+        }
+        if(isset($decodedPanet->orbital_period)){
+            $planet->setOrbitalPeriod($decodedPanet->orbital_period);
+        }else{
+            $planet->setOrbitalPeriod(0);
+        }
+        if(isset($decodedPanet->diameter)){
+            $planet->setDiameter($decodedPanet->diameter);
+        }else{
+            $planet->setDiameter(0);
+        }
         $planet->setFilmsCount(0);
         $planet->setCreated(new \DateTime());
         $planet->setEdited(new \DateTime());
