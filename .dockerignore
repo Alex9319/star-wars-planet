@@ -2,5 +2,4 @@
 .git/
 var/cache/
 var/logs/
-migrations/
 vendor/

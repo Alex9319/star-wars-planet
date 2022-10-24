@@ -4,7 +4,7 @@
 php /var/www/startWarsPlanets/bin/console cache:clear
 
 php /var/www/startWarsPlanets/bin/console doctrine:database:create
-php /var/www/startWarsPlanets/bin/console make:migration
+php /var/www/startWarsPlanets/bin/console --no-interaction doctrine:migrations:migrate
 
 service apache2 start
 
